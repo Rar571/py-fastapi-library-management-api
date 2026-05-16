@@ -44,3 +44,26 @@ def author_create(
     db: Session = Depends(get_db)
 ):
     return crud.create_author(db=db, author=author)
+
+
+@app.get("/books/", response_model=list[schemas.BookList])
+def get_all_books(
+        author_id: int | None = None,
+        db: Session = Depends(get_db)
+    ):
+    return crud.get_all_books(db=db, author_id=author_id)
+
+
+@app.get("/books/{book_id}/", response_model=schemas.BookList)
+def book_detail(book_id: int, db: Session = Depends(get_db)):
+    book = crud.get_book(db=db, book_id=book_id)
+
+    if book is None:
+        raise HTTPException(status_code=404, detail="Book with this id is not found")
+
+    return book
+
+
+@app.post("/books/", response_model=schemas.BookList)
+def create_book(book: schemas.BookCreate, db: Session = Depends(get_db)):
+    return crud.create_book(db=db, book=book)
